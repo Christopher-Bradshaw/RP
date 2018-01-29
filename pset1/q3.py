@@ -8,8 +8,8 @@ k = 1.381 * 1e-16 # Boltzmann's const in ergs
 c = 2.998 * 1e10 # Speed of light in cm/s
 h = 6.626 * 1e-27 # Planck const in ergs*s
 
-# Min and max float with a couple (58) orders of magnitude to be safe...
-n_min, n_max = 1e-250, 1e250
+# Very safe margins so we don't run into numerical issues
+n_min, n_max = 1e-50, 1e50
 
 # Calculate the maximum nu value we can have given float precision
 def nu_limits(T):
@@ -42,19 +42,36 @@ def a():
                 numerically_integrated_planck_function(temp))
 
     # And plot the planck function for fun
-    fig, ax = plt.subplots()
+    _, ax = plt.subplots()
     for temp in np.power(10, np.arange(5)):
         nus = np.logspace(4, np.log10(nu_limits(temp)[1]), num=500)
-        ax.plot(nus, planck_function(nus, temp))
+        ax.plot(nus, planck_function(nus, temp), label=temp)
     ax.set(xscale="log", yscale="log")
     ax.set_ylim(bottom=1e-20)
-    # plt.show()
+    ax.legend()
+    plt.show(block=False)
 
 def b():
-    x = scipy.optimize.minimize(lambda x: np.abs(analytical_derivative_planck_function(*x)), np.array([1, 1]))
+    T = 1e4
+    min_nu, max_nu = nu_limits(T)
+    min_nu = 1 # being reasonable...
+    x = scipy.optimize.brentq(
+            analytical_derivative_planck_function, min_nu, max_nu, args=(T,),
+    )
+
     print(x)
+
+    # And plot the derivative for fun
+    _, ax = plt.subplots()
+    for temp in np.power(10, np.arange(5)):
+        nus = np.logspace(4, np.log10(nu_limits(temp)[1]), num=500)
+        ax.plot(nus, analytical_derivative_planck_function(nus, temp), label=temp)
+    ax.set(xscale="log")#, yscale="log")
+    ax.legend()
+    plt.show(block=False)
 
 
 if __name__ == "__main__":
-    # a()
+    a()
     b()
+    input()
