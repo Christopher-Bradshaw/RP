@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 import scipy.integrate
+import scipy.optimize
 import matplotlib.pyplot as plt
 
 k = 1.381 * 1e-16 # Boltzmann's const in ergs
@@ -30,8 +31,9 @@ def planck_function(nu, T):
 
 def analytical_derivative_planck_function(nu, T):
     factor = np.exp(h * nu / (k * T))
-    return 2 * h * v**2 / (c**2 * (factor - 1)) * (
-            3 + (nu * h) / ((k * T) * (factor - 1) * factor))
+    return 2 * h * nu**2 / (c**2 * (factor - 1)) * (
+            3 - (nu * h * factor) / (k * T * (factor - 1)))
+
 def a():
     # assert our numerical integration is good
     for temp in np.logspace(0, 20):
@@ -40,19 +42,19 @@ def a():
                 numerically_integrated_planck_function(temp))
 
     # And plot the planck function for fun
-    temps = np.power(10, np.arange(5))
     fig, ax = plt.subplots()
-    for temp in temps:
+    for temp in np.power(10, np.arange(5)):
         nus = np.logspace(4, np.log10(nu_limits(temp)[1]), num=500)
         ax.plot(nus, planck_function(nus, temp))
     ax.set(xscale="log", yscale="log")
     ax.set_ylim(bottom=1e-20)
-    plt.show()
+    # plt.show()
 
 def b():
-    analytical_derivative_planck_function(1e11, 1e4)
+    x = scipy.optimize.minimize(lambda x: np.abs(analytical_derivative_planck_function(*x)), np.array([1, 1]))
+    print(x)
 
 
 if __name__ == "__main__":
-    a()
+    # a()
     b()
