@@ -120,13 +120,16 @@ def part_b():
     for i in range(len(nu_peaks)):
         print("At temp {}K the peak in frequency is at {:.6e}Hz and in wavelength is at {:.6e}cm".format(
             temps[i], nu_peaks[i], lambda_peaks[i]))
+        print("This is an x value of {} and a y value of {}".format(
+            h*nu_peaks[i]/(k*temps[i]), h*c/(lambda_peaks[i]*k*temps[i])))
 
 
 def part_c():
     for temp in np.power(10, np.arange(5)):
-        print("Peak for temperature {}K, is at frequency 10^{:.6e}Hz".format(
-            temp, np.log10(find_planck_peaks(temp, analytical_temp_derivative_planck_function)))
-            )
+        nu_peak = find_planck_peaks(temp, analytical_temp_derivative_planck_function)
+        print("Peak for temperature {}K, is at frequency {:.6e}Hz".format(
+            temp, nu_peak))
+        print("This is an x value of {}".format(h*nu_peak/(k*temp)))
 
 if __name__ == "__main__":
     part_a()
