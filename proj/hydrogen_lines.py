@@ -5,48 +5,61 @@ from scipy.stats import norm
 import matplotlib.pyplot as plt
 
 def get_base_array():
-    # we want to go from 1e14 to 1e15. 901 points gives us slices of 1e12
-    return np.linspace(1e14, 1e15, num=901)
+    return np.linspace(1e14, 1e15, num=4000000)
 
 def ev_to_nu(ev):
     return ev / 4.135667662e-15 # plancks const in ev
 
 # We are assuming thermal line broading
+# I think I need more broadnign from somewhere
 def get_line_width(nu):
-    return math.sqrt(c.k * c.T / (c.mH * c.c**2)) * nu
+    return math.sqrt(c.k * c.T / c.mH) * nu/c.c
 
 def get_line(nu, height):
+    nus = get_base_array()
     width = get_line_width(nu)
+    assert width / (nus[1] - nus[0]) > 10 # enough detail to integrate
     num_sds = 5
     start, stop = nu - num_sds*width, nu + num_sds*width
-    nus = np.linspace(start, stop)
+    assert start > nus[0] and stop < nus[-1]
 
     rv = norm(loc = nu, scale = width)
     ergs = rv.pdf(nus)*height
-    ergs[0], ergs[-1] = 0, 0 # just zero it out
-    # plt.plot(nus, rv.pdf(nus))
-    # plt.show()
 
-    return nus, ergs
+    return ergs
 
 def get_lines(lines):
-    lines = np.sort(lines, order="energies")
-    all_nus, all_ergs = [], []
+    output_ergs = np.zeros_like(get_base_array())
+    all_ergs = []
     for line in lines:
-        nus, ergs = get_line(ev_to_nu(line["energies"]), line["intensities"])
-        all_nus.append(nus)
+        ergs = get_line(ev_to_nu(line["energies"]), line["intensities"])
         all_ergs.append(ergs)
-    nus = np.concatenate(all_nus)
-    ergs = np.concatenate(all_ergs)
-    return nus, ergs
+        output_ergs += ergs
+    return output_ergs, all_ergs
 
 def get_line_emission_coeff(lines):
-    nus, ergs = get_lines(lines)
+    nus = get_base_array()
+    ergs, all_ergs = get_lines(lines)
     ergs = ergs * 1.24e-25
+    all_ergs = [i*1.24e-25 for i in all_ergs]
+
+    # Summed
     _, ax = plt.subplots()
     ax.plot(nus, ergs)
     ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    # plt.show()
+
+    # Separate
+    _, ax = plt.subplots()
+    for i in all_ergs:
+        ax.plot(nus, i)
+    ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    print(all_ergs[1])
+    tot_ergs = np.trapz(all_ergs[1], nus)
+    print(tot_ergs)
+
     plt.show()
+
     return nus, ergs
 
 
@@ -61,14 +74,14 @@ def main():
     # 3, 4, 5 \n, 6 - 10\n 11 - 15 \n 16 - 20
     balmer_intensities = np.array([2.87, 1, 0.466,
         0.256, 0.158, 0.105, 0.073, 0.0529,
-        *np.linspace(0.0529, 0.0154, num=5, endpoint=False),
-        *np.linspace(0.0154, 0.0064, num=5, endpoint=False)])
+        *np.linspace(0.0529, 0.0154, num=6)[1:],
+        *np.linspace(0.0154, 0.0064, num=6 )[1:]])
     paschen_energies = energy_levels[3:] - energy_levels[2]
     # 4, 5 \n, 6 - 10\n 11 - 15 \n 16 - 20
     paschen_intensities = np.array([0.352, 0.354,
         0.354, 0.352, 0.350, 0.350, 0.350,
-        *np.linspace(0.350, 0.344, num=5, endpoint=False),
-        *np.linspace(0.344, 0.344, num=5, endpoint=False)] * balmer_intensities[1:])
+        *np.linspace(0.350, 0.344, num=6)[1:],
+        *np.linspace(0.344, 0.344, num=6)[1:]] * balmer_intensities[1:])
 
     energies = np.concatenate((balmer_energies, paschen_energies))
     intensities = np.concatenate((balmer_intensities, paschen_intensities))

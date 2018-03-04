@@ -5,7 +5,7 @@ T = 10000 # K
 # Boltzmass's const
 k = 1.38064852e-16 # erg/K
 # Mass of hydrogen
-mH = 1.67e-30 # g
+mH = 1.67e-24 # g
 
 
 # Effective recombination coefficient
