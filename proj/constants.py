@@ -1,3 +1,13 @@
+# Speed of light
+c = 3e10 # cm/s
+# Temperature
+T = 10000 # K
+# Boltzmass's const
+k = 1.38064852e-16 # erg/K
+# Mass of hydrogen
+mH = 1.67e-30 # g
+
+
 # Effective recombination coefficient
 # Table 4.11, page 77. cm^3 s^-1
 alpha_eff_2s = 0.838e-13

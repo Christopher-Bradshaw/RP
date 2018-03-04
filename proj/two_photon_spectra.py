@@ -27,11 +27,10 @@ def get_two_photon_spectrum_vs_nu():
     return nus, ergs_hz
 
 def get_two_photon_spectrum_vs_lambda():
-    speed_of_light = 3e8
     nus, ergs_hz = get_two_photon_spectrum_vs_nu()
-    lambdas = speed_of_light / nus
+    lambdas = c.c / nus
 
-    ergs_m = ergs_hz * speed_of_light * np.power(lambdas, -2)
+    ergs_m = ergs_hz * c.c * np.power(lambdas, -2)
     return lambdas[::-1], ergs_m[::-1]
 
 def sanity_check_lambda():
@@ -66,9 +65,12 @@ def get_two_photon_emission_coefficient(Np, Ne):
 
 def sanity_check_emission_coeff():
     nus, coeff = get_two_photon_emission_coefficient(1, 1)
-    plt.plot(nus, coeff)
+    _, ax = plt.subplots()
+    ax.plot(nus, coeff)
+    ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
     plt.show()
 
+# 4.28 in osterbrock
 def get_two_photon_jv(Np, Ne):
     nus, gamma = get_two_photon_emission_coefficient(Np, Ne)
     jv = Np * Ne * gamma / (4 * np.pi)
