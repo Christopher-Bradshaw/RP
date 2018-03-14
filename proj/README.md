@@ -8,4 +8,9 @@ Emission spectrum from two photon emission. Basically,
 * Scale this spectrum by the the number of peturbing particles and some constants to get total emission.
 
 ## Hydrogen lines
-Run with `python3 hydrogen_lines.py`. Should pop up some plots.
+Run with `python3 hydrogen_lines.py`. Should pop up some plots and also the integration over H beta to show that we get the correct flux.
+
+We are only getting the emission from Balmer and Paschen lines at the moment. This is easy to change (just update `main`). The process looks like:
+* For each line, find its width (thermal) and get the emission out to 10 standard deviations
+* Stick them all together.
+

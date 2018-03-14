@@ -16,51 +16,61 @@ def get_line_width(nu):
     return math.sqrt(c.k * c.T / c.mH) * nu/c.c
 
 def get_line(nu, height):
-    nus = get_base_array()
     width = get_line_width(nu)
-    assert width / (nus[1] - nus[0]) > 10 # enough detail to integrate
     num_sds = 5
-    start, stop = nu - num_sds*width, nu + num_sds*width
-    assert start > nus[0] and stop < nus[-1]
-
+    min_nu, max_nu = nu - num_sds*width, nu + num_sds*width
+    nus = np.linspace(min_nu, max_nu, num=100)
     rv = norm(loc = nu, scale = width)
     ergs = rv.pdf(nus)*height
 
-    return ergs
+    ergs[0], ergs[-1] = 0, 0 # terminate at tails
+    return nus, ergs
 
 def get_lines(lines):
-    output_ergs = np.zeros_like(get_base_array())
-    all_ergs = []
+    all_ergs, all_nus = [], []
     for line in lines:
-        ergs = get_line(ev_to_nu(line["energies"]), line["intensities"])
+        nus, ergs = get_line(ev_to_nu(line["energies"]), line["intensities"])
         all_ergs.append(ergs)
-        output_ergs += ergs
-    return output_ergs, all_ergs
+        all_nus.append(nus)
+    return np.array(all_nus), np.array(all_ergs)
 
 def get_line_emission_coeff(lines):
-    nus = get_base_array()
-    ergs, all_ergs = get_lines(lines)
-    ergs = ergs * 1.24e-25
-    all_ergs = [i*1.24e-25 for i in all_ergs]
+    all_nus, all_ergs = get_lines(lines) # These are not actually ergs but in units of h_beta
+    all_evs = 1.24e-25 * all_ergs
+
+    for nus in all_nus:
+        start, end = nus[0], nus[1]
+        start_lt_starts = start < all_nus[:,0]
+        end_lt_starts = end < all_nus[:,0]
+        # If the start is less than some other start, then so must the end be
+        # Therefore all xors must be false
+        # If this is true, we cen just sort by the nus and plot
+        assert np.all(np.logical_not(np.logical_xor(end_lt_starts, start_lt_starts)))
 
     # Summed
-    _, ax = plt.subplots()
-    ax.plot(nus, ergs)
-    ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    # _, ax = plt.subplots()
+    # ax.plot(all_nus, ergs)
+    # ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
     # plt.show()
 
     # Separate
     _, ax = plt.subplots()
-    for i in all_ergs:
-        ax.plot(nus, i)
-    ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
-    print(all_ergs[1])
-    tot_ergs = np.trapz(all_ergs[1], nus)
-    print(tot_ergs)
+    for i, evs in enumerate(all_evs):
+        ax.plot(all_nus[i], evs)
+    ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    tot_ergs = np.trapz(all_evs[1], all_nus[1])
+    print("Integration of H beta:", tot_ergs)
+    plt.show(block=False)
 
+    order = np.argsort(all_nus.flatten())
+    nus = all_nus.flatten()[order]
+    evs = all_evs.flatten()[order]
+    _, ax = plt.subplots()
+    ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    ax.plot(nus, evs)
     plt.show()
 
-    return nus, ergs
+    return all_nus, all_evs
 
 
 def main():
