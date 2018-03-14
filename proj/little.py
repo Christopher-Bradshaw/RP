@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-
 h = 4.135e-15 # in eV
 c = 3e8 # in m/s
 

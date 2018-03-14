@@ -9,8 +9,8 @@ erg_to_ev = 6.242e+11
 # fully (we can linearly interpolate) describes the two photon
 # spectrum
 def get_two_photon_spectrum_vs_nu():
-    e = 1e-99 # We need this to save us from divide by 0 later
-    nus_up = 1e14 * np.array([e + 1.233 * i for i in range(10)])
+    eps = 1e-99 # We need this to save us from divide by 0 later
+    nus_up = 1e14 * np.array([eps + 1.233 * i for i in range(10)])
     nu_midpoint = 12.34e14
     ergs_hz_up = 1e-27 * np.array([
         0.00, 0.303, 0.978, 1.836, 2.78,
@@ -64,7 +64,7 @@ def get_two_photon_emission_coefficient(Np, Ne):
     return nus, gamma_2p
 
 def sanity_check_emission_coeff():
-    nus, coeff = get_two_photon_emission_coefficient(1, 1)
+    nus, coeff = get_two_photon_emission_coefficient(1, 1) # TODO find Np, Ne
     _, ax = plt.subplots()
     ax.plot(nus, coeff)
     ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
@@ -74,9 +74,14 @@ def sanity_check_emission_coeff():
 def get_two_photon_jv(Np, Ne):
     nus, gamma = get_two_photon_emission_coefficient(Np, Ne)
     jv = Np * Ne * gamma / (4 * np.pi)
+    _, ax = plt.subplots()
+    ax.plot(nus, jv)
+    ax.set(yscale="log")
+    plt.show()
     return nus, jv
 
 if __name__ == "__main__":
     # sanity_check_lambda()
     # sanity_check_nu()
     sanity_check_emission_coeff()
+    get_two_photon_jv(1, 1)
