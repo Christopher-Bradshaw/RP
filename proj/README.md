@@ -1,6 +1,6 @@
-# Questions 4 and 5 on the project
+# Questions 4 and 5 on the project + Figure 4.1
 
-## Main
+## Figure 4.1
 Run with `./main.py`. Will pop up a graph that will hopefully look like 4.1 in Osterbrock.
 Add your code to plot your emission coefficient. Whether you add the code to compute this or just load pre computed summaries doesn't really matter.
 Slack me if you have questions.
