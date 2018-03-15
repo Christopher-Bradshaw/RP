@@ -24,3 +24,4 @@ We are only getting the emission from Balmer and Paschen lines at the moment. Th
 * For each line, find its width (thermal) and get the emission out to 10 standard deviations
 * Stick them all together.
 
+![Hydrogen Lines](hydrogen_lines.png)
