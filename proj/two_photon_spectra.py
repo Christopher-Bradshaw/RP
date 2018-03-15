@@ -4,6 +4,7 @@ import constants as c
 
 
 erg_to_ev = 6.242e+11
+use_lambda = True
 
 # Returns a list of nus and the ergs/Hz at those nus. This
 # fully (we can linearly interpolate) describes the two photon
@@ -30,8 +31,8 @@ def get_two_photon_spectrum_vs_lambda():
     nus, ergs_hz = get_two_photon_spectrum_vs_nu()
     lambdas = c.c / nus
 
-    ergs_m = ergs_hz * c.c * np.power(lambdas, -2)
-    return lambdas[::-1], ergs_m[::-1]
+    # ergs_m = ergs_hz * c.c * np.power(lambdas, -2)
+    return lambdas[::-1], ergs_hz[::-1]
 
 def sanity_check_lambda():
     lambdas, ergs_m = get_two_photon_spectrum_vs_lambda()
@@ -56,32 +57,40 @@ def sanity_check_nu():
 
 # Equation 4.29 in osterbrock
 def get_two_photon_emission_coefficient(Np, Ne):
-    nus, g_v = get_two_photon_spectrum_vs_nu()
+    if use_lambda:
+        x, g_v = get_two_photon_spectrum_vs_lambda()
+    else:
+        x, g_v = get_two_photon_spectrum_vs_nu()
     denominator = 1 + (Np * c.q_p_2s_2p + Ne * c.q_e_2s_2p) / c.A_2s_1s
 
     gamma_2p = c.alpha_eff_2s * g_v / denominator
 
-    return nus, gamma_2p
+    return x, gamma_2p
 
 def sanity_check_emission_coeff():
-    nus, coeff = get_two_photon_emission_coefficient(1, 1) # TODO find Np, Ne
+    x, coeff = get_two_photon_emission_coefficient(1, 1) # TODO find Np, Ne
     _, ax = plt.subplots()
-    ax.plot(nus, coeff)
-    ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    if use_lambda:
+        coeff *= c.c/x
+        x *= 1e4 # lambda in units of microns
+        ax.set(yscale="log", xscale="log", xlim=(1e-1, 1e1))
+    else:
+        ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    ax.plot(x, coeff)
     plt.show()
 
 # 4.28 in osterbrock
 def get_two_photon_jv(Np, Ne):
-    nus, gamma = get_two_photon_emission_coefficient(Np, Ne)
+    x, gamma = get_two_photon_emission_coefficient(Np, Ne)
     jv = Np * Ne * gamma / (4 * np.pi)
     _, ax = plt.subplots()
-    ax.plot(nus, jv)
+    ax.plot(x, jv)
     ax.set(yscale="log")
     plt.show()
-    return nus, jv
+    return x, jv
 
 if __name__ == "__main__":
     # sanity_check_lambda()
     # sanity_check_nu()
     sanity_check_emission_coeff()
-    get_two_photon_jv(1, 1)
+    # get_two_photon_jv(1, 1)
