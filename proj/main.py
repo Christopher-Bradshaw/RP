@@ -15,7 +15,10 @@ def main():
 
     # Load and plot your stuff here. NB the units of microns on the x axis and the weird units on the y axis
 
-    ax.set(yscale="log", xscale="log", xlim=(1e-1, 1e1), ylim=(1e-26, 2e-23), xlabel="Wavelength (microns)", ylabel=r"$\nu \gamma_{\nu}\ (erg\ cm^3\ s^{-1})$")
+    ax.set(
+            yscale="log", xscale="log", xlim=(1e-1, 1e1), ylim=(1e-26, 2e-23),
+            xlabel="Wavelength (microns)", ylabel=r"$\nu \gamma_{\nu}\ (erg\ cm^3\ s^{-1})$",
+    )
     ax.annotate(s="T = 10,000K", xy=(0.75, 0.80), xycoords="axes fraction")
     plt.show()
 
