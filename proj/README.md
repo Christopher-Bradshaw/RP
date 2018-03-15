@@ -5,6 +5,11 @@ Run with `./main.py`. Will pop up a graph that will hopefully look like 4.1 in O
 Add your code to plot your emission coefficient. Whether you add the code to compute this or just load pre computed summaries doesn't really matter.
 Slack me if you have questions.
 
+Once you are done, save the updated figure and it will show up here!
+
+![Fig 4.1](4.1.png)
+
+
 ## Two photons
 Run with `python3 two_photon_spectra.py`. Should pop up some plots.
 
