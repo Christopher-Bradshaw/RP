@@ -225,7 +225,7 @@ def get_bound_free_emission_coefs(T, lams = np.linspace(.1,10,1000) * 1e-4, n_le
     you may need to np.argsort for a vs. frequency addition with another spectrum.
     """
     
-    print 'Evaluating the bound free emission coefficients with ' + str(n_levels) + ' quantum levels'
+    print('Evaluating the bound free emission coefficients with ' + str(n_levels) + ' quantum levels')
     
     nus = c/lams
     
@@ -234,7 +234,7 @@ def get_bound_free_emission_coefs(T, lams = np.linspace(.1,10,1000) * 1e-4, n_le
     for lam_i, lam in enumerate(lams):
 
         if print_progress == True:
-            print str(lam_i + 1) + ' of ' +  str(len(lams)) + ' wavelength elements'
+            print(str(lam_i + 1) + ' of ' +  str(len(lams)) + ' wavelength elements')
             
         gamma = 0
         for n_i in np.arange(n_levels)+1:
