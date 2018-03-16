@@ -26,4 +26,10 @@ We are only getting the emission from Balmer and Paschen lines at the moment. Th
 
 ![Hydrogen Lines](hydrogen_lines.png)
 
-## TEST
+## Gaunt Factor
+
+![Gaunt Factors](gbfs.png)
+
+![Average Gaunt Factors](gbfs_avg.png)
+
+## Bound Free Emission
