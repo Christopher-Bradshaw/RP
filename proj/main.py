@@ -32,7 +32,7 @@ def main():
             xlabel="Wavelength (microns)", ylabel=r"$\nu \gamma_{\nu}\ (erg\ cm^3\ s^{-1})$",
     )
     ax.annotate(s="T = 10,000K", xy=(0.75, 0.80), xycoords="axes fraction")
-    plt.show()
+    plt.savefig("4.1.png")
 
 
 if __name__ == "__main__":
