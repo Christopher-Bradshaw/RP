@@ -58,14 +58,6 @@ d_gal = 3e21 # 1kpc
 I_v = output_js / output_as - 1/output_as * np.exp(-output_as * d_gal)
 
 fig, ax = plt.subplots()
-ax.set(yscale="log")
-ax.plot(output_nus, output_js)
-
-fig, ax = plt.subplots()
-ax.set(yscale="log")
-ax.plot(output_nus, output_as)
-
-fig, ax = plt.subplots()
-ax.set(yscale="log")
+ax.set(yscale="log", title="Intensity", xlabel="Nu", ylabel="ergs")
 ax.plot(output_nus, I_v)
 plt.show()

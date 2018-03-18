@@ -12,6 +12,8 @@ Once you are done, save the updated figure and it will show up here!
 ## Combined Spectrum
 Adds up all the components
 
+![Intensities](intensities.png)
+
 
 ## Two photons
 Run with `python3 two_photon_spectra.py`. Should pop up some plots.
