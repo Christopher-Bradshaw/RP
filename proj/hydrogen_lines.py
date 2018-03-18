@@ -4,14 +4,10 @@ import constants as c
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-def get_base_array():
-    return np.linspace(1e14, 1e15, num=4000000)
-
 def ev_to_nu(ev):
     return ev / 4.135667662e-15 # plancks const in ev
 
 # We are assuming thermal line broading
-# I think I need more broadnign from somewhere
 def get_line_width(nu):
     return math.sqrt(c.k * c.T / c.mH) * nu/c.c
 
@@ -37,8 +33,8 @@ def get_lines(lines):
 
 def get_line_emission_coeff():
     lines = choose_line_energies()
-    all_nus, all_emission_hbeta = get_lines(lines)
-    all_ergs = 1.24e-25 * all_emission_hbeta # magic number is hBeta
+    # this isn't actually ergs, but energy in units of hbeta
+    all_nus, all_ergs = get_lines(lines)
 
     for nus in all_nus:
         start, end = nus[0], nus[1]
@@ -69,6 +65,17 @@ def get_line_emission_coeff():
     # plt.show()
 
     return nus, ergs
+
+def get_line_emission_jv(n_p, n_e):
+    nus, ergs = get_line_emission_coeff()
+    ergs = 1.24e-25 * n_p * n_e * ergs / (4 * np.pi)
+    return nus, ergs
+
+def get_line_emission_av():
+    nus, ergs = get_line_emission_coeff()
+    ergs = ergs * 3.03e-14
+    return nus, ergs
+
 
 def choose_line_energies():
     highest_level = 21

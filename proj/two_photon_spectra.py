@@ -80,13 +80,14 @@ def sanity_check_emission_coeff():
     plt.show()
 
 # 4.28 in osterbrock
-def get_two_photon_jv(Np, Ne):
+def get_two_photon_jv(Np, Ne, plot=False):
     x, gamma = get_two_photon_emission_coefficient(Np, Ne)
     jv = Np * Ne * gamma / (4 * np.pi)
-    _, ax = plt.subplots()
-    ax.plot(x, jv)
-    ax.set(yscale="log")
-    plt.show()
+    if plot:
+        _, ax = plt.subplots()
+        ax.plot(x, jv)
+        ax.set(yscale="log")
+        plt.show()
     return x, jv
 
 if __name__ == "__main__":
