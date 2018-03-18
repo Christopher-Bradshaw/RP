@@ -34,9 +34,11 @@ def get_lines(lines):
         all_nus.append(nus)
     return np.array(all_nus), np.array(all_ergs)
 
-def get_line_emission_coeff(lines):
-    all_nus, all_ergs = get_lines(lines) # These are not actually ergs but in units of h_beta
-    all_evs = 1.24e-25 * all_ergs
+
+def get_line_emission_coeff():
+    lines = choose_line_energies()
+    all_nus, all_emission_hbeta = get_lines(lines)
+    all_ergs = 1.24e-25 * all_emission_hbeta # magic number is hBeta
 
     for nus in all_nus:
         start, end = nus[0], nus[1]
@@ -47,33 +49,28 @@ def get_line_emission_coeff(lines):
         # If this is true, we cen just sort by the nus and plot
         assert np.all(np.logical_not(np.logical_xor(end_lt_starts, start_lt_starts)))
 
-    # Summed
-    # _, ax = plt.subplots()
-    # ax.plot(all_nus, ergs)
-    # ax.set(yscale="log", xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
-    # plt.show()
-
-    # Separate
-    _, ax = plt.subplots()
-    for i, evs in enumerate(all_evs):
-        ax.plot(all_nus[i], evs)
-    ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
-    tot_ergs = np.trapz(all_evs[1], all_nus[1])
-    print("Integration of H beta:", tot_ergs)
-    plt.show(block=False)
-
     order = np.argsort(all_nus.flatten())
     nus = all_nus.flatten()[order]
-    evs = all_evs.flatten()[order]
-    _, ax = plt.subplots()
-    ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
-    ax.plot(nus, evs)
-    plt.show()
+    ergs = all_ergs.flatten()[order]
 
-    return all_nus, all_evs
+    # Separate
+    # _, ax = plt.subplots()
+    # for i, ergs in enumerate(all_ergs):
+    #     ax.plot(all_nus[i], ergs)
+    # ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    # tot_ergs = np.trapz(all_ergs[1], all_nus[1])
+    # print("Integration of H beta:", tot_ergs)
+    # plt.show(block=False)
 
+    # Together
+    # _, ax = plt.subplots()
+    # ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
+    # ax.plot(nus, ergs)
+    # plt.show()
 
-def main():
+    return nus, ergs
+
+def choose_line_energies():
     highest_level = 21
     # In case B, all Lyman series photons above lyman alpha are converted
     # In case B, we ignore everything that goes to level 1 (because it will be absorbed immediately)
@@ -98,8 +95,10 @@ def main():
     lines = np.zeros(len(energies), dtype=[("energies", np.float), ("intensities", np.float)])
     lines["energies"] = energies
     lines["intensities"] = intensities
+    return(lines)
 
-    get_line_emission_coeff(lines)
+def main():
+    get_line_emission_coeff()
 
 if __name__ == "__main__":
     main()
