@@ -43,7 +43,10 @@ output_nus = np.linspace(min_nu, max_nu, num=1000000)
 
 # If they can take an array of nus, do so here.
 j_nus.append(free_free.j_nu(output_nus,T, n_p, n_e))
+nus_j.append(output_nus)
 a_nus.append(free_free.alpha_nu(output_nus,T, n_p, n_e))
+nus_a.append(output_nus)
+
 
 output_js = np.sum([np.interp(output_nus, nus_j[i], j_nus[i]) for i in range(len(nus_j))], axis=0)
 

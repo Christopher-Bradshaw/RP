@@ -82,6 +82,8 @@ def alpha_nu(nu, T, N_i, N_e):
     h = 6.62606885e-27 # erg * s
     kB = 1.3806485279e-16 # erg/K
     logU = np.log10((h * nu)/(kB * T))
+    Z = 2 # Hydrogen
+    Ry = 2.1798723e-11 # erg
     logGammaSquared = np.log10((Z*Z * Ry)/(kB * T))
     return 3.7e8/np.sqrt(T) * N_i * N_e * (1 - np.exp((-h * nu)/(kB * T)))/np.power(nu, 3) * get_gaunt_u_gamma(logU, logGammaSquared)
 
