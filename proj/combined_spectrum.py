@@ -14,7 +14,10 @@ import numpy as np
 
 from tyler import free_free
 
-n_p, n_e, T = 1, 1, 10000
+bound_free = np.loadtxt('bf_spec.txt', skiprows = 1)
+
+
+n_p, n_e, T = 1e3, 1e3, 10000
 
 nus_for_j_arr, j_nus = [], [] # the nus used for the js and the js at those nus
 nus_for_a_arr, a_nus = [], []
@@ -31,17 +34,20 @@ nus_for_j_arr.append(h_nus)
 j_nus.append(h_j)
 
 h_nus, j_a = hydrogen_lines.get_line_emission_av()
-nus_for_a_arr.append(h_nus)
-a_nus.append(j_a)
+# nus_for_a_arr.append(h_nus)
+# a_nus.append(j_a)
 
-
-# If other things have specific NUs they need on the x axis, add them in here
+# Bound Free
+bf_gamma, bf_nus = bound_free[:,0], bound_free[:,1]
+bf_j = bf_gamma * n_p * n_e / (4 * np.pi)
+nus_for_j_arr.append(bf_nus)
+j_nus.append(bf_j)
 
 
 # Interpolated everything into same nu grid
-min_nu = min(np.min(np.hstack(nus_for_j_arr)), np.min(np.hstack(nus_for_a_arr)))
-max_nu = max(np.max(np.hstack(nus_for_j_arr)), np.max(np.hstack(nus_for_a_arr)))
-output_nus = np.linspace(min_nu, max_nu, num=1000000)
+min_nu = np.min(np.hstack(nus_for_j_arr))#, np.min(np.hstack(nus_for_a_arr)))
+max_nu = np.max(np.hstack(nus_for_j_arr))#, np.max(np.hstack(nus_for_a_arr)))
+output_nus = np.linspace(min_nu, max_nu, num=10000000)
 
 # If they can take an array of nus, do so here.
 j_nus.append(free_free.j_nu(output_nus,T, n_p, n_e))
@@ -51,13 +57,23 @@ nus_for_a_arr.append(output_nus)
 
 output_js = np.sum([np.interp(output_nus, nus_for_j_arr[i], j_nus[i]) for i in range(len(nus_for_j_arr))], axis=0)
 output_as = np.sum([np.interp(output_nus, nus_for_a_arr[i], a_nus[i]) for i in range(len(nus_for_a_arr))], axis=0)
+output_gammas = np.copy(output_js) * 4 * np.pi / (n_p * n_e)
 
 output_js *= 1e53 # I think we need to multiple by the stellar lum?
 # I_v = S_v - 1/a_v e ^ (-a_v d_gal)
 d_gal = 3e21 # 1kpc
 I_v = output_js / output_as - 1/output_as * np.exp(-output_as * d_gal)
 
+L_v = I_v *16 * np.pi**2 * d_gal**2
+np.save("gas_spectrum", [L_v, output_nus])
 fig, ax = plt.subplots()
 ax.set(yscale="log", title="Intensity", xlabel="Nu", ylabel="ergs")
-ax.plot(output_nus, I_v)
+ax.plot(output_nus, L_v)
+
+f_esc = 0
+L_v = output_gammas / 2e-14 * (1 - f_esc) * 1e53
+np.save("gas_spectrum", [L_v, output_nus])
+fig, ax = plt.subplots()
+ax.set(yscale="log", title="Intensity", xlabel="Nu", ylabel="ergs")
+ax.plot(output_nus, L_v)
 plt.show()
