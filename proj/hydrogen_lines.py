@@ -54,8 +54,8 @@ def get_line_emission_coeff():
     # for i, ergs in enumerate(all_ergs):
     #     ax.plot(all_nus[i], ergs)
     # ax.set(yscale="log")#, xlim=(3e14, 10e14), ylim=(1e-40, 1e-38))
-    # tot_ergs = np.trapz(all_ergs[1], all_nus[1])
-    # print("Integration of H beta:", tot_ergs)
+    tot_ergs = np.trapz(all_ergs[1], all_nus[1])
+    print("Integration of H beta:", tot_ergs)
     # plt.show(block=False)
 
     # Together
@@ -105,7 +105,9 @@ def choose_line_energies():
     return(lines)
 
 def main():
-    get_line_emission_coeff()
+    nus, ergs = get_line_emission_coeff()
+    plt.plot(nus, ergs)
+    plt.show()
 
 if __name__ == "__main__":
     main()
